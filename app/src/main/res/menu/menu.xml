@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/opt_number"
+        android:title="数字"/>
+    <item android:id="@+id/opt_animal"
+        android:title="动物"/>
+    <item android:id="@+id/opt_vehicle"
+        android:title="交通工具"/>
+    <item android:id="@+id/opt_fruit"
+        android:title="水果"/>
+    <item android:id="@+id/opt_color"
+        android:title="颜色"/>
+    <item android:id="@+id/opt_shape"
+        android:title="形状"/>
+    <item android:id="@+id/opt_test"
+        android:title="测试"
+        app:showAsAction="always"/>
+    <item android:id="@+id/opt_language"
+        android:title="语言"
+        app:showAsAction="always">
+        <menu>
+            <item android:id="@+id/opt_cn"
+                android:title="中文"/>
+            <item android:id="@+id/opt_en"
+                android:title="英文"/>
+        </menu>
+    </item>
+
+</menu>
