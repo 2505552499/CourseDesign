@@ -1,9 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".TestActivity">
-
-</androidx.constraintlayout.widget.ConstraintLayout>
+    android:orientation="vertical"
+    android:background="@drawable/caibeijing">
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:src="@drawable/caicaikan"
+        android:layout_marginBottom="30dp"/>
+    <TextView
+        android:id="@+id/tv_guess"
+        android:layout_width="wrap_content"
+        android:layout_height="30sp"
+        android:layout_marginBottom="60dp"
+        android:textSize="24sp"
+        android:text="下面哪幅图的水果是：苹果"/>
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="15dp">
+        <TableRow android:layout_weight="1">
+            <ImageView
+                android:id="@+id/iv_random1"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_column="0"
+                android:src="@drawable/pingguo"/>
+            <ImageView
+                android:id="@+id/iv_random2"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_column="1"
+                android:src="@drawable/xiangjiao"/>
+        </TableRow>
+        <TableRow android:layout_weight="1">
+            <ImageView
+                android:id="@+id/iv_random3"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_column="0"
+                android:src="@drawable/xiangjiao"/>
+            <ImageView
+                android:id="@+id/iv_random4"
+                android:layout_height="wrap_content"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_column="1"
+                android:src="@drawable/pingguo"/>
+        </TableRow>
+    </TableLayout>
+</LinearLayout>
