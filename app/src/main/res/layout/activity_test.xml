@@ -8,49 +8,58 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:src="@drawable/caicaikan"
-        android:layout_marginBottom="30dp"/>
-    <TextView
-        android:id="@+id/tv_guess"
-        android:layout_width="wrap_content"
-        android:layout_height="30sp"
-        android:layout_marginBottom="60dp"
-        android:textSize="24sp"
-        android:text="下面哪幅图的水果是：苹果"/>
-    <TableLayout
+        android:layout_marginBottom="20dp"/>
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="15dp">
-        <TableRow android:layout_weight="1">
+        android:layout_marginBottom="20dp"
+        android:orientation="horizontal">
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"
+            android:text="下面哪幅图是："/>
+        <TextView
+            android:id="@+id/tv_guess"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="24sp"/>
+    </LinearLayout>
+
+    <TableLayout
+        android:layout_width="match_parent"
+        android:layout_height="400dp">
+        <TableRow>
             <ImageView
                 android:id="@+id/iv_random1"
-                android:layout_height="wrap_content"
+                android:layout_height="170dp"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_column="0"
-                android:src="@drawable/pingguo"/>
+                android:scaleType="fitXY"/>
             <ImageView
                 android:id="@+id/iv_random2"
-                android:layout_height="wrap_content"
+                android:layout_height="170dp"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_column="1"
-                android:src="@drawable/xiangjiao"/>
+                android:scaleType="fitXY"/>
         </TableRow>
-        <TableRow android:layout_weight="1">
+        <TableRow>
             <ImageView
                 android:id="@+id/iv_random3"
-                android:layout_height="wrap_content"
+                android:layout_height="170dp"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_column="0"
-                android:src="@drawable/xiangjiao"/>
+                android:scaleType="fitXY"/>
             <ImageView
                 android:id="@+id/iv_random4"
-                android:layout_height="wrap_content"
+                android:layout_height="170dp"
                 android:layout_width="0dp"
                 android:layout_weight="1"
                 android:layout_column="1"
-                android:src="@drawable/pingguo"/>
+                android:scaleType="fitXY"/>
         </TableRow>
     </TableLayout>
 </LinearLayout>

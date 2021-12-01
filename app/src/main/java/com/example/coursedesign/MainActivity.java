@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     Button btn_learn;
     List<Picture> Pictures = new ArrayList<>();
     @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
