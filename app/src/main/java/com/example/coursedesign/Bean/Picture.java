@@ -26,7 +26,7 @@ public class Picture implements Serializable {
         this.type = type;
     }
     public static Picture getInstance(int id, String name, String path, String audio_cn, String audio_en, String text_cn, String text_en, String type){
-        return new Picture(id, name, path, audio_cn, text_en, text_cn, text_en, type);
+        return new Picture(id, name, path, audio_cn, audio_en, text_cn, text_en, type);
     }
 
 

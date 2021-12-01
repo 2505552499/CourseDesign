@@ -43,6 +43,7 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
     Random random = new Random();
     Map<Integer, Bitmap> bitmaps = new HashMap<>();
 
+    @SuppressLint("HandlerLeak")
     Handler handler = new Handler() {
         @SuppressLint("HandlerLeak")
         public void handleMessage(Message msg) {

@@ -3,11 +3,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/caibeijing">
+    android:background="@drawable/learnbg2">
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:src="@drawable/caicaikan"
+        android:src="@drawable/caiyicai"
+        android:scaleType="fitXY"
         android:layout_marginBottom="20dp"/>
     <LinearLayout
         android:layout_width="match_parent"

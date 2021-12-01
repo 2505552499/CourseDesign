@@ -2,6 +2,7 @@ package com.example.coursedesign;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -61,10 +62,8 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
     private TextView tvname;
     private TextView tvpinyin;
     private TextView tvename;
-    private Button btnnext;
-    private Button btnpre;
-    private Button btnplay;
-    private Button btnautoplay;
+
+    @SuppressLint("HandlerLeak")
     Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             if (msg.what == 1) {
@@ -75,8 +74,9 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
                 ivbuttom1.setImageBitmap(bitmap1);
                 ivbuttom2.setImageBitmap(bitmap2);
                 ivbutotm3.setImageBitmap(bitmap3);
-            } else {
-                Toast.makeText(LearnActivity.this, "加载图片失败", Toast.LENGTH_SHORT).show();
+            }else if(msg.what == 2){
+                next();
+                playCnEn();
             }
         }
     };
@@ -91,6 +91,7 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
         for (int i = 0; i < Pictures.size(); i++) {
             getImage(Pictures, i);
         }
+
         tvpinyin.setText(Pictures.get(0).getText_cn());
         tvname.setText(Pictures.get(0).getName());
         tvename.setText(Pictures.get(0).getText_en());
@@ -154,14 +155,14 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
         tvname = (TextView) findViewById(R.id.tv_name);
         tvename = findViewById(R.id.tv_ename);
         tvpinyin = findViewById(R.id.tv_pinyin);
-        btnnext = findViewById(R.id.btn_next);
-        btnplay = findViewById(R.id.btn_play);
-        btnpre = findViewById(R.id.btn_pre);
-        btnnext.setOnClickListener(this::onClick);
-        btnpre.setOnClickListener(this::onClick);
-        btnplay.setOnClickListener(this::onClick);
-        btnautoplay = findViewById(R.id.auto_play);
-        btnautoplay.setOnClickListener(this::onClick);
+        ImageView btnnext = findViewById(R.id.btn_next);
+        ImageView btnplay = findViewById(R.id.btn_play);
+        ImageView btnpre = findViewById(R.id.btn_pre);
+        btnnext.setOnClickListener(this);
+        btnpre.setOnClickListener(this);
+        btnplay.setOnClickListener(this);
+        ImageView btnautoplay = findViewById(R.id.auto_play);
+        btnautoplay.setOnClickListener(this);
     }
 
     private void getScreenWidthAndHeight() {
@@ -179,36 +180,12 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
+        inflater.inflate(R.menu.menulearn, menu);
         return true;
     }
 
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.opt_number:
-                type = 1;
-                Toast.makeText(this, "数字", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.opt_animal:
-                type = 2;
-                Toast.makeText(this, "动物", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.opt_vehicle:
-                type = 3;
-                Toast.makeText(this, "交通工具", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.opt_fruit:
-                type = 4;
-                Toast.makeText(this, "水果", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.opt_color:
-                type = 5;
-                Toast.makeText(this, "颜色", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.opt_shape:
-                type = 6;
-                Toast.makeText(this, "形状", Toast.LENGTH_SHORT).show();
-                return true;
             case R.id.opt_cn:
                 language = 0;
                 Toast.makeText(LearnActivity.this, "切换成功", Toast.LENGTH_SHORT).show();
@@ -248,7 +225,6 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
                         if (code == 200) {
                             InputStream is = conn.getInputStream();
                             bitmap = BitmapFactory.decodeStream(is);
-//                            Pictures.add(new Picture(pictures.getInt(0), pictures.getString(1), bitmap, pictures.getString(3), pictures.getString(4), pictures.getString(5), pictures.getString(6), pictures.getString(7)));
                             bitmaps.put(i, bitmap);
                             Message msg = new Message();
                             msg.what = 1;
@@ -318,16 +294,66 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
             @Override
             public void onPrepared(MediaPlayer mp) {
                 mediaPlayer.start();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mediaPlayer.release();
+                    }
+                });
+            }
+        });
+    }
+    public void playCnEn(){
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mediaPlayer.setDataSource(Pictures.get(position).getAudio_cn());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaPlayer.prepareAsync();
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mediaPlayer.start();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mediaPlayer.release();
+                        playEn();
+                    }
+                });
+            }
+        });
+    }
+    public void playEn(){
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mediaPlayer.setDataSource(Pictures.get(position).getAudio_en());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaPlayer.prepareAsync();
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mediaPlayer.start();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mediaPlayer.release();
+                    }
+                });
             }
         });
     }
 
-    public void autoplay() {
-
-    }
-
+    Timer timer = new Timer();
+    TimerTask timerTask = null;
     @Override
     public void onClick(View v) {
+
         switch (v.getId()) {
             case R.id.btn_next:
                 next();
@@ -340,19 +366,21 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
                 break;
             case R.id.auto_play:
                 autoplay = Math.abs(autoplay - 1);
-                /*if (autoplay == 1) {
-                    Timer timer = new Timer();
-                    timer.schedule(new TimerTask() {
+                if(autoplay == 1){
+                    timerTask = new TimerTask() {
                         @Override
                         public void run() {
-                            next();
-                            play();
+                            Message message = new Message();
+                            message.what = 2;
+                            handler.sendMessage(message);
                         }
-                    }, 2000);
-                }*/
-                if(autoplay == 1){
-                    next();
-                    play();
+                    };
+                    timer.schedule(timerTask, 0, 3000);
+                }else if(autoplay == 0){
+                    if(timerTask != null){
+                        timerTask.cancel();
+                        timerTask = null;
+                    }
                 }
             default:
                 break;

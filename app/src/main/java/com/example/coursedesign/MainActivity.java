@@ -5,11 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.text.TextUtils;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -20,29 +16,24 @@ import android.widget.Toast;
 import com.example.coursedesign.Bean.Picture;
 import com.example.coursedesign.sqlite.MyHelper;
 
-import java.io.InputStream;
 import java.io.Serializable;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
     int language = 0;
-    int type = 4;
+    int typeid = 4;
     MyHelper myHelper;
     SQLiteDatabase db;
     Button btn_learn;
-    List<Picture> Pictures = new ArrayList<>();
+    List<Picture> Pictures;
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         init();
-        createPicture(type);
+        Pictures = createPicture(typeid);
         btn_learn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -61,52 +52,93 @@ public class MainActivity extends AppCompatActivity {
         btn_learn = findViewById(R.id.btn_learn);
     }
 
-    private void createPicture(int type) {
-        Cursor pictures = db.query("picture", null, null, null, null, null, null);
-        if(pictures.getCount() == 0){
-            Toast.makeText(this, "没有数据", Toast.LENGTH_SHORT).show();
+    private List<Picture>  createPicture(int typeid) {
+        List<Picture> tempPictures = new ArrayList<>();
+        String type = "fruit";
+        switch (typeid){
+            case 1:
+                type = "number";
+                break;
+            case 2:
+                type = "animal";
+                break;
+            case 3:
+                type = "vehicle";
+                break;
+            case 4:
+                type = "fruit";
+                break;
+            case 5:
+                type = "color";
+                break;
+            case 6:
+                type = "shape";
+                break;
+        }
+        String[] columms = {"type"};
+        Cursor cursor = db.query("picture", null, "type=?", new String[]{type}, null, null, null);
+        if(cursor.getCount() == 0){
+            Toast.makeText(this, "没有数据,请重新选择分类", Toast.LENGTH_SHORT).show();
         }else{
-            pictures.moveToFirst();
-            Picture picture = Picture.getInstance(pictures.getInt(0), pictures.getString(1), pictures.getString(2), pictures.getString(3), pictures.getString(4), pictures.getString(5), pictures.getString(6), pictures.getString(7));
-            Pictures.add(picture);
+            cursor.moveToFirst();
+            Picture picture = Picture.getInstance(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7));
+            tempPictures.add(picture);
 
         }
-        while(pictures.moveToNext()){
-//            Pictures.add(new Picture(pictures.getInt(0), pictures.getString(1), bitmaps.get(Pictures.size()), pictures.getString(3), pictures.getString(4), pictures.getString(5), pictures.getString(6), pictures.getString(7)));
-            Picture picture = new Picture(pictures.getInt(0), pictures.getString(1), pictures.getString(2), pictures.getString(3), pictures.getString(4), pictures.getString(5), pictures.getString(6), pictures.getString(7));
-            Pictures.add(picture);
+        while(cursor.moveToNext()){
+            Picture picture = new Picture(cursor.getInt(0), cursor.getString(1), cursor.getString(2), cursor.getString(3), cursor.getString(4), cursor.getString(5), cursor.getString(6), cursor.getString(7));
+            tempPictures.add(picture);
         }
+        return tempPictures;
     }
     public boolean onCreateOptionsMenu(Menu menu){
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu, menu);
+        inflater.inflate(R.menu.menumain, menu);
         return true;
     }
     public boolean onOptionsItemSelected(MenuItem item){
         switch (item.getItemId()){
             case R.id.opt_number:
-                type = 1;
-                Toast.makeText(this, "数字", Toast.LENGTH_SHORT).show();
+                typeid = 1;
+                Pictures.clear();
+                Pictures = createPicture(typeid);
+                if(Pictures.size() != 0)
+                    Toast.makeText(this, "切换分类为数字成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_animal:
-                type = 2;
-                Toast.makeText(this, "动物", Toast.LENGTH_SHORT).show();
+                typeid = 2;
+                Pictures.clear();
+                Pictures = createPicture(typeid);
+                if(Pictures.size() != 0)
+                    Toast.makeText(this, "切换分类为动物成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_vehicle:
-                type = 3;
-                Toast.makeText(this, "交通工具", Toast.LENGTH_SHORT).show();
+                typeid = 3;
+                Pictures.clear();
+                Pictures = createPicture(typeid);
+                if(Pictures.size() != 0)
+                    Toast.makeText(this, "切换分类为交通工具成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_fruit:
-                type = 4;
-                Toast.makeText(this, "水果", Toast.LENGTH_SHORT).show();
+                typeid = 4;
+                Pictures.clear();
+                Pictures = createPicture(typeid);
+                if(Pictures.size() != 0)
+                    Toast.makeText(this, "切换分类为水果成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_color:
-                type = 5;
-                Toast.makeText(this, "颜色", Toast.LENGTH_SHORT).show();
+                typeid = 5;
+                Pictures.clear();
+                Pictures = createPicture(typeid);
+                if(Pictures.size() != 0)
+                    Toast.makeText(this, "切换分类为颜色成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_shape:
-                type = 6;
-                Toast.makeText(this, "形状", Toast.LENGTH_SHORT).show();
+                typeid = 6;
+                Pictures.clear();
+                Pictures = createPicture(typeid);
+                if(Pictures.size() != 0)
+                    Toast.makeText(this, "切换分类为形状成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_cn:
                 language = 0;
@@ -117,7 +149,15 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "切换成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_test:
-                Intent intent = new Intent(this, TestActivity.class);
+                if(Pictures.size() != 0){
+                    Intent intent = new Intent(this, TestActivity.class);
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("Pictures", (Serializable) Pictures);
+                    intent.putExtras(bundle);
+                    startActivity(intent);
+                }else{
+                    Toast.makeText(this, "所选分类没有数据，请重新选择", Toast.LENGTH_SHORT).show();
+                }
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
