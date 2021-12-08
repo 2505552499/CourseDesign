@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.coursedesign.Bean.Picture;
+import com.example.coursedesign.Bean.User;
 import com.example.coursedesign.sqlite.MyHelper;
 
 import java.io.Serializable;
@@ -27,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     SQLiteDatabase db;
     Button btn_learn;
     List<Picture> Pictures;
+    User user;
     @Override
 
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, LearnActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("Pictures", (Serializable) Pictures);
+                bundle.putSerializable("user", user);
                 intent.putExtras(bundle);
                 startActivity(intent);
             }
@@ -153,14 +156,48 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(this, TestActivity.class);
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("Pictures", (Serializable) Pictures);
+                    bundle.putSerializable("user", user);
                     intent.putExtras(bundle);
                     startActivity(intent);
                 }else{
                     Toast.makeText(this, "所选分类没有数据，请重新选择", Toast.LENGTH_SHORT).show();
                 }
                 return true;
+            case R.id.opt_login:
+                Intent intent = new Intent(this, LoginActivity.class);
+                startActivityForResult(intent, 1);
+                return true;
+            case R.id.opt_logout:
+                user = null;
+                Toast.makeText(this, "注销成功", Toast.LENGTH_SHORT).show();
+                return true;
+            case R.id.opt_wrongbook:
+                if(user == null){
+                    Toast.makeText(this, "请先登录后使用错题集功能", Toast.LENGTH_SHORT).show();
+                }else{
+                    int wid = user.getWid();
+                    Cursor cursor = db.rawQuery("select * from wrongbook where wid=?", new String[]{String.valueOf(wid)});
+                    if(cursor.getCount() == 0){
+                        Toast.makeText(this, "您当前没有错题，恭喜！", Toast.LENGTH_SHORT).show();
+                    }else{
+                        Intent intent1 = new Intent(this, WrongTestActivity.class);
+                        Bundle bundle = new Bundle();
+                        bundle.putSerializable("user", user);
+                        intent1.putExtras(bundle);
+                        startActivity(intent1);
+                    }
+                }
+                return true;
             default:
                 return super.onOptionsItemSelected(item);
+        }
+    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 1 && resultCode == 1){
+            Bundle bundle = data.getExtras();
+            user = (User) bundle.getSerializable("user");
+            Toast.makeText(this, "欢迎您：" + user.getName(), Toast.LENGTH_SHORT).show();
         }
     }
 }

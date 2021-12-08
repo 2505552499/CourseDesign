@@ -3,6 +3,7 @@ package com.example.coursedesign;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.media.AudioManager;
@@ -21,6 +22,8 @@ import java.io.IOException;
 import java.util.Random;
 
 import com.example.coursedesign.Bean.Picture;
+import com.example.coursedesign.Bean.User;
+import com.example.coursedesign.sqlite.MyHelper;
 
 import java.io.InputStream;
 import java.net.HttpURLConnection;
@@ -38,6 +41,9 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
     ImageView ivRandom2;
     ImageView ivRandom3;
     ImageView ivRandom4;
+    User user;
+    MyHelper helper;
+    SQLiteDatabase db;
     List<Integer> init_arr;
     List<Picture> Pictures = new ArrayList<>();
     Random random = new Random();
@@ -63,6 +69,7 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_test);
         init();
         Bundle bundle = this.getIntent().getExtras();
+        user = (User) bundle.getSerializable("user");
         Pictures = (List<Picture>) bundle.getSerializable("Pictures");
         getImage(Pictures, Pictures.size());
         Log.e("order: ", "oncreat");
@@ -74,19 +81,21 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
                 msg.what = 1;
                 handler.sendMessage(msg);
             }
-        },50);
+        },300);
     }
 
     private void init() {
+        helper = new MyHelper(this);
+        db = helper.getWritableDatabase();
         tvGuess = findViewById(R.id.tv_guess);
         ivRandom1 = findViewById(R.id.iv_random1);
-        ivRandom1.setOnClickListener(this::onClick);
+        ivRandom1.setOnClickListener(this);
         ivRandom2 = findViewById(R.id.iv_random2);
-        ivRandom2.setOnClickListener(this::onClick);
+        ivRandom2.setOnClickListener(this);
         ivRandom3 = findViewById(R.id.iv_random3);
-        ivRandom3.setOnClickListener(this::onClick);
+        ivRandom3.setOnClickListener(this);
         ivRandom4 = findViewById(R.id.iv_random4);
-        ivRandom4.setOnClickListener(this::onClick);
+        ivRandom4.setOnClickListener(this);
     }
 
 
@@ -183,6 +192,9 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
                 if(Pictures.get(init_arr.get(4)).getName().equals(Pictures.get(init_arr.get(0)).getName())){
                     mediaPlayer = MediaPlayer.create(this, R.raw.zhengque);
                 }else{
+                    int wid = user.getWid();
+                    int pid = Pictures.get(init_arr.get(4)).getId();
+                    db.execSQL("insert into wrongbook (wid, pid) values (?, ?)", new Object[]{wid, pid});
                     mediaPlayer = MediaPlayer.create(this, R.raw.cuowu);
                 }
                 mediaPlayer.start();
@@ -201,6 +213,9 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
                 if(Pictures.get(init_arr.get(4)).getName().equals(Pictures.get(init_arr.get(1)).getName())){
                     mediaPlayer = MediaPlayer.create(this, R.raw.zhengque);
                 }else{
+                    int wid = user.getWid();
+                    int pid = Pictures.get(init_arr.get(4)).getId();
+                    db.execSQL("insert into wrongbook (wid, pid) values (?, ?)", new Object[]{wid, pid});
                     mediaPlayer = MediaPlayer.create(this, R.raw.cuowu);
                 }
                 mediaPlayer.start();
@@ -219,6 +234,9 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
                 if(Pictures.get(init_arr.get(4)).getName().equals(Pictures.get(init_arr.get(2)).getName())){
                     mediaPlayer = MediaPlayer.create(this, R.raw.zhengque);
                 }else{
+                    int wid = user.getWid();
+                    int pid = Pictures.get(init_arr.get(4)).getId();
+                    db.execSQL("insert into wrongbook (wid, pid) values (?, ?)", new Object[]{wid, pid});
                     mediaPlayer = MediaPlayer.create(this, R.raw.cuowu);
                 }
                 mediaPlayer.start();
@@ -237,6 +255,9 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
                 if(Pictures.get(init_arr.get(4)).getName().equals(Pictures.get(init_arr.get(3)).getName())){
                     mediaPlayer = MediaPlayer.create(this, R.raw.zhengque);
                 }else{
+                    int wid = user.getWid();
+                    int pid = Pictures.get(init_arr.get(4)).getId();
+                    db.execSQL("insert into wrongbook (wid, pid) values (?, ?)", new Object[]{wid, pid});
                     mediaPlayer = MediaPlayer.create(this, R.raw.cuowu);
                 }
                 mediaPlayer.start();

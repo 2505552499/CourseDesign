@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -44,14 +45,14 @@ import java.util.Timer;
 import java.util.TimerTask;
 
 
-public class LearnActivity extends AppCompatActivity implements View.OnClickListener {
+public class WrongTestActivity extends AppCompatActivity implements View.OnClickListener {
     int language = 0;
     int position = 0;
     int autoplay = 0;
-    int type = 4;
-    User user;
     MyHelper myHelper;
     SQLiteDatabase db;
+    User user;
+    int wid;
     List<Picture> Pictures = new ArrayList<>();
     Map<Integer, Bitmap> bitmaps = new HashMap<>();
     private GestureDetector gestureDetector;
@@ -86,11 +87,29 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_learn);
+        setContentView(R.layout.activity_wrong_test);
+        Intent intent = getIntent();
+        Bundle bundle1 = intent.getExtras();
+        user = (User) bundle1.getSerializable("user");
+        wid = user.getWid();
         init();
-        Bundle bundle = this.getIntent().getExtras();
-        user = (User) bundle.getSerializable("user");
-        Pictures = (List<Picture>) bundle.getSerializable("Pictures");
+        Cursor cursor_wid = db.rawQuery("select * from wrongbook where wid=?", new String[]{String.valueOf(wid)});
+        int len = cursor_wid.getCount();
+        int j = 1;
+        String[] pids = new String[len];
+        cursor_wid.moveToFirst();
+        pids[0] = String.valueOf(cursor_wid.getInt(1));
+        while(cursor_wid.moveToNext()){
+            pids[j++] = String.valueOf(cursor_wid.getInt(1));
+        }
+        Cursor cursor_pid = db.rawQuery("select * from picture where pid in (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", pids);
+        cursor_pid.moveToFirst();
+        Picture picture = new Picture(cursor_pid.getInt(0), cursor_pid.getString(1), cursor_pid.getString(2), cursor_pid.getString(3), cursor_pid.getString(4), cursor_pid.getString(5), cursor_pid.getString(6), cursor_pid.getString(7));
+        Pictures.add(picture);
+        while (cursor_pid.moveToNext()){
+            Picture picture1 = new Picture(cursor_pid.getInt(0), cursor_pid.getString(1), cursor_pid.getString(2), cursor_pid.getString(3), cursor_pid.getString(4), cursor_pid.getString(5), cursor_pid.getString(6), cursor_pid.getString(7));
+            Pictures.add(picture1);
+        }
         for (int i = 0; i < Pictures.size(); i++) {
             getImage(Pictures, i);
         }
@@ -166,6 +185,9 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
         btnplay.setOnClickListener(this);
         ImageView btnautoplay = findViewById(R.id.auto_play);
         btnautoplay.setOnClickListener(this);
+        Button btn_delete = findViewById(R.id.btn_delete);
+        btn_delete.setOnClickListener(this);
+
     }
 
     private void getScreenWidthAndHeight() {
@@ -173,6 +195,53 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
         Display display = windowManager.getDefaultDisplay();
         ScreenWidth = display.getWidth();
         ScreenHeight = display.getHeight();
+    }
+
+    public void playCnEn(){
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mediaPlayer.setDataSource(Pictures.get(position).getAudio_cn());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaPlayer.prepareAsync();
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mediaPlayer.start();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mediaPlayer.release();
+                        playEn();
+                    }
+                });
+            }
+        });
+    }
+
+    public void playEn(){
+        MediaPlayer mediaPlayer = new MediaPlayer();
+        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+        try {
+            mediaPlayer.setDataSource(Pictures.get(position).getAudio_en());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        mediaPlayer.prepareAsync();
+        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mediaPlayer.start();
+                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        mediaPlayer.release();
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -191,17 +260,16 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
         switch (item.getItemId()) {
             case R.id.opt_cn:
                 language = 0;
-                Toast.makeText(LearnActivity.this, "切换成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(WrongTestActivity.this, "切换成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_en:
                 language = 1;
-                Toast.makeText(LearnActivity.this, "切换成功", Toast.LENGTH_SHORT).show();
+                Toast.makeText(WrongTestActivity.this, "切换成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_test:
                 Intent intent = new Intent(this, TestActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("Pictures", (Serializable) Pictures);
-                bundle.putSerializable("user", user);
                 intent.putExtras(bundle);
                 startActivity(intent);
                 return true;
@@ -232,7 +300,6 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
                             bitmaps.put(i, bitmap);
                             Message msg = new Message();
                             msg.what = 1;
-                            msg.obj = bitmaps.get(2);
                             handler.sendMessage(msg);
                         }
                     } catch (Exception e) {
@@ -307,52 +374,6 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
             }
         });
     }
-    public void playCnEn(){
-        MediaPlayer mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        try {
-            mediaPlayer.setDataSource(Pictures.get(position).getAudio_cn());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mediaPlayer.prepareAsync();
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mediaPlayer.start();
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        mediaPlayer.release();
-                        playEn();
-                    }
-                });
-            }
-        });
-    }
-    public void playEn(){
-        MediaPlayer mediaPlayer = new MediaPlayer();
-        mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
-        try {
-            mediaPlayer.setDataSource(Pictures.get(position).getAudio_en());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        mediaPlayer.prepareAsync();
-        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mediaPlayer.start();
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        mediaPlayer.release();
-                    }
-                });
-            }
-        });
-    }
-
     Timer timer = new Timer();
     TimerTask timerTask = null;
     @Override
@@ -385,6 +406,25 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
                         timerTask.cancel();
                         timerTask = null;
                     }
+                }
+                break;
+            case R.id.btn_delete:
+                Picture cur_picture = Pictures.get(position);
+                int pid = cur_picture.getId();
+                int wid = user.getWid();
+                db.execSQL("delete from wrongbook where wid=? and pid=?",new Object[]{wid,pid});
+                if (Pictures.size() != 1) {
+                    finish();
+                    startActivity(getIntent());
+                }else{
+                    Toast.makeText(this, "恭喜您已掌握所有错题！", Toast.LENGTH_SHORT).show();
+                    Timer timer = new Timer();
+                    timer.schedule(new TimerTask() {
+                        @Override
+                        public void run() {
+                            finish();
+                        }
+                    },2000);
                 }
                 break;
             default:
