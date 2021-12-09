@@ -3,6 +3,7 @@ package com.example.coursedesign;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -41,6 +42,7 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
     ImageView ivRandom2;
     ImageView ivRandom3;
     ImageView ivRandom4;
+    MediaPlayer mediaPlayer;
     User user;
     MyHelper helper;
     SQLiteDatabase db;
@@ -72,7 +74,6 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
         user = (User) bundle.getSerializable("user");
         Pictures = (List<Picture>) bundle.getSerializable("Pictures");
         getImage(Pictures, Pictures.size());
-        Log.e("order: ", "oncreat");
         Timer timer=new Timer();
         timer.schedule(new TimerTask() {
             @Override
@@ -81,7 +82,7 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
                 msg.what = 1;
                 handler.sendMessage(msg);
             }
-        },300);
+        },500);
     }
 
     private void init() {
@@ -123,20 +124,20 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void play(String path) {
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.xiamian);
+        mediaPlayer = MediaPlayer.create(this, R.raw.xiamian);
         mediaPlayer.start();
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 mediaPlayer.release();
+                mediaPlayer = null;
                 play2(path);
             }
         });
-        Log.e("order", "play ");
     }
 
     public void play2(String path) {
-        MediaPlayer mediaPlayer = new MediaPlayer();
+        mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
             mediaPlayer.setDataSource(path);
@@ -149,6 +150,7 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
                         @Override
                         public void onCompletion(MediaPlayer mp) {
                             mediaPlayer.release();
+                            mediaPlayer = null;
                         }
                     });
                 }
@@ -156,217 +158,99 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Log.e("order", "play2");
     }
     public void play3(){
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.zhengque);
+        mediaPlayer = MediaPlayer.create(this, R.raw.zhengque);
         mediaPlayer.start();
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 mediaPlayer.release();
+                mediaPlayer = null;
             }
         });
     }
     public void play4(){
-        MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.cuowu);
+        mediaPlayer = MediaPlayer.create(this, R.raw.cuowu);
         mediaPlayer.start();
         mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
             public void onCompletion(MediaPlayer mp) {
                 mediaPlayer.release();
+                mediaPlayer = null;
             }
         });
     }
 
+    public void change(int id){
+        if(mediaPlayer != null){
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+        switch (init_arr.get(5)){
+            case 0:
+                ivRandom2.setImageResource(R.drawable.error);
+                ivRandom3.setImageResource(R.drawable.error);
+                ivRandom4.setImageResource(R.drawable.error);
+                break;
+            case 1:
+                ivRandom1.setImageResource(R.drawable.error);
+                ivRandom3.setImageResource(R.drawable.error);
+                ivRandom4.setImageResource(R.drawable.error);
+                break;
+            case 2:
+                ivRandom1.setImageResource(R.drawable.error);
+                ivRandom2.setImageResource(R.drawable.error);
+                ivRandom4.setImageResource(R.drawable.error);
+                break;
+            case 3:
+                ivRandom1.setImageResource(R.drawable.error);
+                ivRandom2.setImageResource(R.drawable.error);
+                ivRandom3.setImageResource(R.drawable.error);
+                break;
+            default:
+                break;
+        }
+        if(Pictures.get(init_arr.get(4)).getName().equals(Pictures.get(init_arr.get(id)).getName())){
+            mediaPlayer = MediaPlayer.create(this, R.raw.zhengque);
+        }else{
+            if(user != null){
+                int wid = user.getWid();
+                int pid = Pictures.get(init_arr.get(4)).getId();
+                Cursor cursor = db.rawQuery("select * from wrongbook where wid=? and pid=?", new String[]{String.valueOf(wid), String.valueOf(pid)});
+                if(cursor.getCount() == 0){
+                    db.execSQL("insert into wrongbook (wid, pid) values (?, ?)", new Object[]{wid, pid});
+                }
+            }
+            mediaPlayer = MediaPlayer.create(this, R.raw.cuowu);
+        }
+        mediaPlayer.start();
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                mediaPlayer.release();
+                init_arr = getRandom();
+                String path = Pictures.get(init_arr.get(4)).getAudio_cn();
+                play(path);
+            }
+        });
+    }
     @Override
     public void onClick(View v) {
         MediaPlayer mediaPlayer;
         switch (v.getId()) {
             case R.id.iv_random1:
-                switch (init_arr.get(5)){
-                    case 0:
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 1:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 2:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 3:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        break;
-                    default:
-                        break;
-                }
-                if(Pictures.get(init_arr.get(4)).getName().equals(Pictures.get(init_arr.get(0)).getName())){
-                    mediaPlayer = MediaPlayer.create(this, R.raw.zhengque);
-                }else{
-                    if(user != null){
-                        int wid = user.getWid();
-                        int pid = Pictures.get(init_arr.get(4)).getId();
-                        db.execSQL("insert into wrongbook (wid, pid) values (?, ?)", new Object[]{wid, pid});
-                    }
-                    mediaPlayer = MediaPlayer.create(this, R.raw.cuowu);
-                }
-                mediaPlayer.start();
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        mediaPlayer.release();
-                        init_arr = getRandom();
-                        String path = Pictures.get(init_arr.get(4)).getAudio_cn();
-                        play(path);
-                    }
-                });
+                change(0);
                 break;
             case R.id.iv_random2:
-                switch (init_arr.get(5)){
-                    case 0:
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 1:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 2:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 3:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        break;
-                    default:
-                        break;
-                }
-                if(Pictures.get(init_arr.get(4)).getName().equals(Pictures.get(init_arr.get(1)).getName())){
-                    mediaPlayer = MediaPlayer.create(this, R.raw.zhengque);
-                }else{
-                    if(user != null){
-                        int wid = user.getWid();
-                        int pid = Pictures.get(init_arr.get(4)).getId();
-                        db.execSQL("insert into wrongbook (wid, pid) values (?, ?)", new Object[]{wid, pid});
-                    }
-                    mediaPlayer = MediaPlayer.create(this, R.raw.cuowu);
-                }
-                mediaPlayer.start();
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        mediaPlayer.release();
-                        init_arr = getRandom();
-                        String path = Pictures.get(init_arr.get(4)).getAudio_cn();
-                        play(path);
-                    }
-                });
+                change(1);
                 break;
             case R.id.iv_random3:
-                switch (init_arr.get(5)){
-                    case 0:
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 1:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 2:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 3:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        break;
-                    default:
-                        break;
-                }
-                if(Pictures.get(init_arr.get(4)).getName().equals(Pictures.get(init_arr.get(2)).getName())){
-                    mediaPlayer = MediaPlayer.create(this, R.raw.zhengque);
-                }else{
-                    if(user != null){
-                        int wid = user.getWid();
-                        int pid = Pictures.get(init_arr.get(4)).getId();
-                        db.execSQL("insert into wrongbook (wid, pid) values (?, ?)", new Object[]{wid, pid});
-                    }
-                    mediaPlayer = MediaPlayer.create(this, R.raw.cuowu);
-                }
-                mediaPlayer.start();
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        mediaPlayer.release();
-                        init_arr = getRandom();
-                        String path = Pictures.get(init_arr.get(4)).getAudio_cn();
-                        play(path);
-                    }
-                });
+                change(2);
                 break;
             case R.id.iv_random4:
-                switch (init_arr.get(5)){
-                    case 0:
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 1:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 2:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom4.setImageResource(R.drawable.error);
-                        break;
-                    case 3:
-                        ivRandom1.setImageResource(R.drawable.error);
-                        ivRandom2.setImageResource(R.drawable.error);
-                        ivRandom3.setImageResource(R.drawable.error);
-                        break;
-                    default:
-                        break;
-                }
-                if(Pictures.get(init_arr.get(4)).getName().equals(Pictures.get(init_arr.get(3)).getName())){
-                    mediaPlayer = MediaPlayer.create(this, R.raw.zhengque);
-                }else{
-                    if(user != null){
-                        int wid = user.getWid();
-                        int pid = Pictures.get(init_arr.get(4)).getId();
-                        db.execSQL("insert into wrongbook (wid, pid) values (?, ?)", new Object[]{wid, pid});
-                    }
-                    mediaPlayer = MediaPlayer.create(this, R.raw.cuowu);
-                }
-                mediaPlayer.start();
-                mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-                    @Override
-                    public void onCompletion(MediaPlayer mp) {
-                        mediaPlayer.release();
-                        init_arr = getRandom();
-                        String path = Pictures.get(init_arr.get(4)).getAudio_cn();
-                        play(path);
-                    }
-                });
-                break;
+                change(3);
         }
     }
 
@@ -402,6 +286,14 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
                 }.start();
             }
         }
-        Log.e("order", "getImage" );
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(mediaPlayer != null){
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
     }
 }

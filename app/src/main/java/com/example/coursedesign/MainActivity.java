@@ -43,8 +43,9 @@ public class MainActivity extends AppCompatActivity {
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("Pictures", (Serializable) Pictures);
                 bundle.putSerializable("user", user);
+                intent.putExtra("language", language);
                 intent.putExtras(bundle);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         });
     }
@@ -188,8 +189,9 @@ public class MainActivity extends AppCompatActivity {
                         Intent intent1 = new Intent(this, WrongTestActivity.class);
                         Bundle bundle = new Bundle();
                         bundle.putSerializable("user", user);
+                        intent1.putExtra("language", language);
                         intent1.putExtras(bundle);
-                        startActivity(intent1);
+                        startActivityForResult(intent1, 1);
                     }
                 }
                 return true;
@@ -203,6 +205,14 @@ public class MainActivity extends AppCompatActivity {
             Bundle bundle = data.getExtras();
             user = (User) bundle.getSerializable("user");
             Toast.makeText(this, "欢迎您：" + user.getName(), Toast.LENGTH_SHORT).show();
+        }
+        if(requestCode == 1 && resultCode == 2){
+            Bundle bundle = data.getExtras();
+            user = (User) bundle.getSerializable("user");
+            language = data.getIntExtra("language", 0);
+        }
+        if(requestCode == 1 && resultCode == 3){
+            language = data.getIntExtra("language", 0);
         }
     }
 }

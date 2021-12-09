@@ -66,6 +66,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="24sp"
+            android:clickable="true"
             android:textStyle="bold" />
 
         <TextView
@@ -85,6 +86,7 @@
             android:layout_alignBottom="@+id/tv_name"
             android:layout_toRightOf="@+id/tv_name"
             android:layout_marginLeft="120dp"
+            android:clickable="true"
             android:textSize="24sp"
             android:textStyle="bold" />
     </RelativeLayout>
@@ -97,6 +99,7 @@
                 android:id="@+id/iv_bottom1"
                 android:layout_width="0dp"
                 android:layout_height="120dp"
+                android:clickable="true"
                 android:layout_column="0"
                 android:layout_weight="1"
                 android:scaleType="fitXY"/>
@@ -107,6 +110,7 @@
                 android:layout_height="120dp"
                 android:layout_weight="1"
                 android:layout_column="1"
+                android:clickable="true"
                 android:scaleType="fitXY"/>
             <ImageView
                 android:id="@+id/iv_bottom3"
@@ -114,6 +118,7 @@
                 android:layout_height="120dp"
                 android:layout_weight="1"
                 android:layout_column="2"
+                android:clickable="true"
                 android:scaleType="fitXY"/>
         </TableRow>
 

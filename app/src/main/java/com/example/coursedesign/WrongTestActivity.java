@@ -50,6 +50,7 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
     int position = 0;
     int autoplay = 0;
     MyHelper myHelper;
+    MediaPlayer mediaPlayer;
     SQLiteDatabase db;
     User user;
     int wid;
@@ -70,13 +71,19 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
     Handler handler = new Handler() {
         public void handleMessage(Message msg) {
             if (msg.what == 1) {
-                Bitmap bitmap1 = bitmaps.get(0);
-                Bitmap bitmap2 = bitmaps.get(1);
-                Bitmap bitmap3 = bitmaps.get(2);
-                ivtop.setImageBitmap(bitmap1);
-                ivbuttom1.setImageBitmap(bitmap1);
-                ivbuttom2.setImageBitmap(bitmap2);
-                ivbutotm3.setImageBitmap(bitmap3);
+                int size = bitmaps.size();
+                if(size < 2){
+                    ivtop.setImageBitmap(bitmaps.get(0));
+                    ivbuttom2.setImageBitmap(bitmaps.get(0));
+                }else{
+                    Bitmap bitmap1 = bitmaps.get(size - 1);
+                    Bitmap bitmap2 = bitmaps.get(0);
+                    Bitmap bitmap3 = bitmaps.get(1);
+                    ivtop.setImageBitmap(bitmap2);
+                    ivbuttom1.setImageBitmap(bitmap1);
+                    ivbuttom2.setImageBitmap(bitmap2);
+                    ivbutotm3.setImageBitmap(bitmap3);
+                }
             }else if(msg.what == 2){
                 next();
                 playCnEn();
@@ -91,6 +98,7 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
         Intent intent = getIntent();
         Bundle bundle1 = intent.getExtras();
         user = (User) bundle1.getSerializable("user");
+        language = intent.getIntExtra("language", 0);
         wid = user.getWid();
         init();
         Cursor cursor_wid = db.rawQuery("select * from wrongbook where wid=?", new String[]{String.valueOf(wid)});
@@ -102,7 +110,7 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
         while(cursor_wid.moveToNext()){
             pids[j++] = String.valueOf(cursor_wid.getInt(1));
         }
-        Cursor cursor_pid = db.rawQuery("select * from picture where pid in (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", pids);
+        Cursor cursor_pid = db.rawQuery("select * from picture where pid in (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", pids);
         cursor_pid.moveToFirst();
         Picture picture = new Picture(cursor_pid.getInt(0), cursor_pid.getString(1), cursor_pid.getString(2), cursor_pid.getString(3), cursor_pid.getString(4), cursor_pid.getString(5), cursor_pid.getString(6), cursor_pid.getString(7));
         Pictures.add(picture);
@@ -170,13 +178,18 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
     private void init() {
         ivtop = findViewById(R.id.iv_top);
         ivbuttom1 = findViewById(R.id.iv_bottom1);
+        ivbuttom1.setOnClickListener(this);
         ivbuttom2 = findViewById(R.id.iv_bottom2);
+        ivbuttom2.setOnClickListener(this);
         ivbutotm3 = findViewById(R.id.iv_bottom3);
+        ivbutotm3.setOnClickListener(this);
         myHelper = new MyHelper(this);
         db = myHelper.getWritableDatabase();
         tvname = (TextView) findViewById(R.id.tv_name);
         tvename = findViewById(R.id.tv_ename);
+        tvename.setOnClickListener(this);
         tvpinyin = findViewById(R.id.tv_pinyin);
+        tvpinyin.setOnClickListener(this);
         ImageView btnnext = findViewById(R.id.btn_next);
         ImageView btnplay = findViewById(R.id.btn_play);
         ImageView btnpre = findViewById(R.id.btn_pre);
@@ -252,7 +265,7 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
 
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menulearn, menu);
+        inflater.inflate(R.menu.menuwrong, menu);
         return true;
     }
 
@@ -260,18 +273,24 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
         switch (item.getItemId()) {
             case R.id.opt_cn:
                 language = 0;
+                Intent intent = new Intent();
+                intent.putExtra("language", language);
+                setResult(3, intent);
                 Toast.makeText(WrongTestActivity.this, "切换成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_en:
                 language = 1;
+                Intent intent2 = new Intent();
+                intent2.putExtra("language", language);
+                setResult(3, intent2);
                 Toast.makeText(WrongTestActivity.this, "切换成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_test:
-                Intent intent = new Intent(this, TestActivity.class);
+                Intent intent3 = new Intent(this, TestActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("Pictures", (Serializable) Pictures);
-                intent.putExtras(bundle);
-                startActivity(intent);
+                intent3.putExtras(bundle);
+                startActivity(intent3);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -313,50 +332,62 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
     }
 
     public void next() {
+        Bitmap bitmap1;
+        Bitmap bitmap2;
+        Bitmap bitmap3;
         position += 1;
-        if (position == Pictures.size()) position = 0;
-        if (position < Pictures.size()) {
-            Bitmap bitmap = bitmaps.get(position);
-            Bitmap bitmap2 = bitmaps.get(position + 1);
-            Bitmap bitmap3 = bitmaps.get(position + 2);
-            ivtop.setImageBitmap(bitmap);
-            ivbuttom1.setImageBitmap(bitmap);
-            ivbuttom2.setImageBitmap(bitmap2);
-            ivbutotm3.setImageBitmap(bitmap3);
-            ivtop.setImageBitmap(bitmap);
-            tvpinyin.setText(Pictures.get(position).getText_cn());
-            tvname.setText(Pictures.get(position).getName());
-            tvename.setText(Pictures.get(position).getText_en());
+        if(position == Pictures.size()) position = 0;
+        if(position - 1 < 0){
+            bitmap1 = bitmaps.get(Pictures.size() - 1);
+        }else{
+            bitmap1 = bitmaps.get(position - 1);
         }
+        if(position + 1 == Pictures.size()){
+            bitmap3 = bitmaps.get(0);
+        }else{
+            bitmap3 = bitmaps.get(position + 1);
+        }
+        bitmap2 = bitmaps.get(position);
+        ivtop.setImageBitmap(bitmap2);
+        ivbuttom1.setImageBitmap(bitmap1);
+        ivbuttom2.setImageBitmap(bitmap2);
+        ivbutotm3.setImageBitmap(bitmap3);
+        tvpinyin.setText(Pictures.get(position).getText_cn());
+        tvname.setText(Pictures.get(position).getName());
+        tvename.setText(Pictures.get(position).getText_en());
     }
 
     public void pre() {
+        Bitmap bitmap1;
+        Bitmap bitmap2;
+        Bitmap bitmap3;
         position -= 1;
-        if (position == -1) position = Pictures.size() - 1;
-        if (position >= 0) {
-            Bitmap bitmap = bitmaps.get(position);
-            Bitmap bitmap2 = bitmaps.get(position + 1);
-            Bitmap bitmap3 = bitmaps.get(position + 2);
-            ivtop.setImageBitmap(bitmap);
-            ivbuttom1.setImageBitmap(bitmap);
-            ivbuttom2.setImageBitmap(bitmap2);
-            ivbutotm3.setImageBitmap(bitmap3);
-            tvpinyin.setText(Pictures.get(position).getText_cn());
-            tvname.setText(Pictures.get(position).getName());
-            tvename.setText(Pictures.get(position).getText_en());
+        if(position == -1) position = Pictures.size() - 1;
+        if(position - 1 < 0){
+            bitmap1 = bitmaps.get(Pictures.size() - 1);
+        }else{
+            bitmap1 = bitmaps.get(position - 1);
         }
+        if(position + 1 == Pictures.size()){
+            bitmap3 = bitmaps.get(0);
+        }else{
+            bitmap3 = bitmaps.get(position + 1);
+        }
+        bitmap2 = bitmaps.get(position);
+        ivtop.setImageBitmap(bitmap2);
+        ivbuttom1.setImageBitmap(bitmap1);
+        ivbuttom2.setImageBitmap(bitmap2);
+        ivbutotm3.setImageBitmap(bitmap3);
+        tvpinyin.setText(Pictures.get(position).getText_cn());
+        tvname.setText(Pictures.get(position).getName());
+        tvename.setText(Pictures.get(position).getText_en());
     }
 
-    public void play() {
-        MediaPlayer mediaPlayer = new MediaPlayer();
+    public void playCn(){
+        mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
         try {
-            if (language == 0) {
-                mediaPlayer.setDataSource(Pictures.get(position).getAudio_cn());
-            } else if (language == 1) {
-                mediaPlayer.setDataSource(Pictures.get(position).getAudio_en());
-            }
-
+            mediaPlayer.setDataSource(Pictures.get(position).getAudio_cn());
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -369,11 +400,13 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
                     @Override
                     public void onCompletion(MediaPlayer mp) {
                         mediaPlayer.release();
+                        mediaPlayer = null;
                     }
                 });
             }
         });
     }
+
     Timer timer = new Timer();
     TimerTask timerTask = null;
     @Override
@@ -387,7 +420,8 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
                 pre();
                 break;
             case R.id.btn_play:
-                play();
+                if(language == 0) playCn();
+                else playEn();
                 break;
             case R.id.auto_play:
                 autoplay = Math.abs(autoplay - 1);
@@ -409,6 +443,7 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
                 }
                 break;
             case R.id.btn_master:
+                if(Pictures.size() == 2 || Pictures.size() == 1) position = 0;
                 Picture cur_picture = Pictures.get(position);
                 int pid = cur_picture.getId();
                 int wid = user.getWid();
@@ -425,10 +460,35 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
                             finish();
                         }
                     },2000);
+                    finish();
                 }
+                break;
+            case R.id.tv_pinyin:
+                playCn();
+                break;
+            case R.id.tv_ename:
+                playEn();
+                break;
+            case R.id.iv_bottom1:
+                pre();
+                break;
+            case R.id.iv_bottom3:
+                next();
                 break;
             default:
                 break;
+        }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if(timerTask != null){
+            timerTask.cancel();
+            timerTask = null;
+        }
+        if(mediaPlayer != null){
+            mediaPlayer.release();
+            mediaPlayer = null;
         }
     }
 }
