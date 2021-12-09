@@ -164,8 +164,13 @@ public class MainActivity extends AppCompatActivity {
                 }
                 return true;
             case R.id.opt_login:
-                Intent intent = new Intent(this, LoginActivity.class);
-                startActivityForResult(intent, 1);
+                if(user == null){
+                    Intent intent = new Intent(this, LoginActivity.class);
+                    startActivityForResult(intent, 1);
+                }else{
+                    Toast.makeText(this, "您已经登录，换账号请先注销", Toast.LENGTH_SHORT).show();
+                }
+
                 return true;
             case R.id.opt_logout:
                 user = null;

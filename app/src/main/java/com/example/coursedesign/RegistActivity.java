@@ -43,9 +43,9 @@ public class RegistActivity extends AppCompatActivity implements View.OnClickLis
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_regist:
-                String account = et_account.getText().toString();
-                String name = et_name.getText().toString();
-                String password = et_password.getText().toString();
+                String account = et_account.getText().toString().trim();
+                String name = et_name.getText().toString().trim();
+                String password = et_password.getText().toString().trim();
                 Cursor cursor = db.rawQuery("select * from user where account=?", new String[]{account});
                 Cursor cursor1 = db.rawQuery("select * from user ", null);
                 int wid = cursor1.getCount() + 1;

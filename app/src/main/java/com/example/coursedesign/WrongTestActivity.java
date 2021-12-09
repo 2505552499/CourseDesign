@@ -185,8 +185,8 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
         btnplay.setOnClickListener(this);
         ImageView btnautoplay = findViewById(R.id.auto_play);
         btnautoplay.setOnClickListener(this);
-        Button btn_delete = findViewById(R.id.btn_delete);
-        btn_delete.setOnClickListener(this);
+        ImageView btn_master = findViewById(R.id.btn_master);
+        btn_master.setOnClickListener(this);
 
     }
 
@@ -408,7 +408,7 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
                     }
                 }
                 break;
-            case R.id.btn_delete:
+            case R.id.btn_master:
                 Picture cur_picture = Pictures.get(position);
                 int pid = cur_picture.getId();
                 int wid = user.getWid();

@@ -48,8 +48,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.btn_login:
-                account = etAccount.getText().toString();
-                password = etPassword.getText().toString();
+                account = etAccount.getText().toString().trim();
+                password = etPassword.getText().toString().trim();
                 Cursor cursor = db.rawQuery("select * from user where account=?", new String[]{account});
                 if(cursor.getCount() == 0){
                     Toast.makeText(this, "您输入的账号不存在，请重新输入！", Toast.LENGTH_SHORT).show();
