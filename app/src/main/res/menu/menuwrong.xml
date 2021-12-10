@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-    <item android:id="@+id/opt_test"
-        android:title="测试"
-        app:showAsAction="always"/>
     <item android:id="@+id/opt_cn"
         android:title="中文"/>
     <item android:id="@+id/opt_en"

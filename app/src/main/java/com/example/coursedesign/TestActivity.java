@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.Random;
 
 import com.example.coursedesign.Bean.Picture;
@@ -82,7 +83,7 @@ public class TestActivity extends AppCompatActivity implements View.OnClickListe
                 msg.what = 1;
                 handler.sendMessage(msg);
             }
-        },500);
+        },600);
     }
 
     private void init() {

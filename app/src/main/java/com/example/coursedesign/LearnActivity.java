@@ -164,6 +164,7 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
         myHelper = new MyHelper(this);
         db = myHelper.getWritableDatabase();
         tvname = (TextView) findViewById(R.id.tv_name);
+        tvname.setOnClickListener(this);
         tvename = findViewById(R.id.tv_ename);
         tvename.setOnClickListener(this);
         tvpinyin = findViewById(R.id.tv_pinyin);
@@ -214,6 +215,7 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
                 Toast.makeText(LearnActivity.this, "切换成功", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.opt_test:
+                autoplayDestroy();
                 Intent intent2 = new Intent(this, TestActivity.class);
                 Bundle bundle = new Bundle();
                 bundle.putSerializable("Pictures", (Serializable) Pictures);
@@ -222,6 +224,7 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
                 startActivity(intent2);
                 return true;
             case R.id.opt_wrongbook:
+                autoplayDestroy();
                 if(user == null){
                     AlertDialog dialog;
                     dialog = new AlertDialog.Builder(this).setTitle("暂未登录")
@@ -252,7 +255,9 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
                 }
                 return true;
             case R.id.opt_logout:
+                autoplayDestroy();
                 user = null;
+                sendReIntent();
                 Toast.makeText(this, "注销成功", Toast.LENGTH_SHORT).show();
                 return true;
             default:
@@ -477,6 +482,9 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
             case R.id.tv_pinyin:
                 playCn();
                 break;
+            case R.id.tv_name:
+                playCn();
+                break;
             case R.id.tv_ename:
                 playEn();
                 break;
@@ -491,9 +499,7 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    public void autoplayDestroy(){
         if(timerTask != null){
             timerTask.cancel();
             timerTask = null;
@@ -502,5 +508,10 @@ public class LearnActivity extends AppCompatActivity implements View.OnClickList
             mediaPlayer.release();
             mediaPlayer = null;
         }
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        autoplayDestroy();
     }
 }

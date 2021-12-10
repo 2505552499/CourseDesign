@@ -110,7 +110,7 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
         while(cursor_wid.moveToNext()){
             pids[j++] = String.valueOf(cursor_wid.getInt(1));
         }
-        Cursor cursor_pid = db.rawQuery("select * from picture where pid in (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", pids);
+        Cursor cursor_pid = db.rawQuery("select * from picture where pid in (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)", pids);
         cursor_pid.moveToFirst();
         Picture picture = new Picture(cursor_pid.getInt(0), cursor_pid.getString(1), cursor_pid.getString(2), cursor_pid.getString(3), cursor_pid.getString(4), cursor_pid.getString(5), cursor_pid.getString(6), cursor_pid.getString(7));
         Pictures.add(picture);
@@ -186,6 +186,7 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
         myHelper = new MyHelper(this);
         db = myHelper.getWritableDatabase();
         tvname = (TextView) findViewById(R.id.tv_name);
+        tvname.setOnClickListener(this);
         tvename = findViewById(R.id.tv_ename);
         tvename.setOnClickListener(this);
         tvpinyin = findViewById(R.id.tv_pinyin);
@@ -284,13 +285,6 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
                 intent2.putExtra("language", language);
                 setResult(3, intent2);
                 Toast.makeText(WrongTestActivity.this, "切换成功", Toast.LENGTH_SHORT).show();
-                return true;
-            case R.id.opt_test:
-                Intent intent3 = new Intent(this, TestActivity.class);
-                Bundle bundle = new Bundle();
-                bundle.putSerializable("Pictures", (Serializable) Pictures);
-                intent3.putExtras(bundle);
-                startActivity(intent3);
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -464,6 +458,9 @@ public class WrongTestActivity extends AppCompatActivity implements View.OnClick
                 }
                 break;
             case R.id.tv_pinyin:
+                playCn();
+                break;
+            case R.id.tv_name:
                 playCn();
                 break;
             case R.id.tv_ename:

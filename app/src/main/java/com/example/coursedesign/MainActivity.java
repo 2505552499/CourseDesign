@@ -79,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
                 type = "shape";
                 break;
         }
-        String[] columms = {"type"};
         Cursor cursor = db.query("picture", null, "type=?", new String[]{type}, null, null, null);
         if(cursor.getCount() == 0){
             Toast.makeText(this, "没有数据,请重新选择分类", Toast.LENGTH_SHORT).show();
